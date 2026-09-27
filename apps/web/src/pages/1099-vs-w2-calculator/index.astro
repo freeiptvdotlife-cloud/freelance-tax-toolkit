@@ -1,0 +1,100 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdSlot from "../../components/AdSlot.astro";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "1099 vs W2 Take-Home Comparator",
+  applicationCategory: "FinanceApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Compare take-home pay between a W2 salary offer and a 1099 contract rate, accounting for self-employment tax and lost benefits.",
+};
+---
+<BaseLayout
+  title="1099 vs W2 Calculator"
+  description="Free calculator comparing take-home pay between a W2 salary and a 1099 contract rate, including self-employment tax."
+  jsonLd={jsonLd}
+>
+  <h1>1099 vs W2 Take-Home Comparator</h1>
+  <p class="lede">Compare your actual take-home pay between a W2 salary offer and a 1099 contract rate, accounting for self-employment tax.</p>
+  <AdSlot position="top-banner" />
+  <div class="card">
+    <form id="calc-form">
+      <label>W2 annual salary ($)<input type="number" id="w2AnnualSalary" value="80000" min="0" /></label>
+      <label>1099 contract rate ($/year)<input type="number" id="contractRate" value="100000" min="0" /></label>
+      <label>Filing status
+        <select id="filingStatus">
+          <option value="single">Single</option>
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </label>
+      <label>State<input type="text" id="state" value="TX" maxlength="2" style="text-transform:uppercase" /></label>
+      <label>Value of W2 benefits lost ($/year)<input type="number" id="w2BenefitsValue" value="12000" min="0" /></label>
+      <label>Annual business expenses ($)<input type="number" id="selfEmployedExpenses" value="3000" min="0" /></label>
+      <label>Retirement contribution (% of income)<input type="number" id="retirementContributionPct" value="10" min="0" max="100" /></label>
+      <button type="submit">Calculate</button>
+    </form>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    import { compareW2VsContractor, isStateModeled } from "@freelance-tax-toolkit/tax-engine";
+
+    const form = document.getElementById("calc-form") as HTMLFormElement;
+    const results = document.getElementById("results")!;
+    const num = (id: string) => parseFloat((document.getElementById(id) as HTMLInputElement).value) || 0;
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const state = (document.getElementById("state") as HTMLInputElement).value.toUpperCase();
+      const filingStatus = (document.getElementById("filingStatus") as HTMLSelectElement).value as
+        | "single"
+        | "mfj"
+        | "hoh";
+
+      const output = compareW2VsContractor({
+        w2AnnualSalary: num("w2AnnualSalary"),
+        contractRate: num("contractRate"),
+        filingStatus,
+        state,
+        w2BenefitsValue: num("w2BenefitsValue"),
+        selfEmployedExpenses: num("selfEmployedExpenses"),
+        retirementContributionPct: num("retirementContributionPct"),
+      });
+
+      const stateWarning = isStateModeled(state)
+        ? ""
+        : `<p class="msg msg-warning">⚠️ State tax for "${state}" isn't modeled yet — figures below exclude state tax.</p>`;
+
+      results.innerHTML = `
+        ${stateWarning}
+        <div class="result-row headline"><span>Contractor net take-home</span><strong>$${output.contractorNetTakeHome.toLocaleString()}</strong></div>
+        <div class="result-row"><span>W2 net take-home</span><strong>$${output.w2NetTakeHome.toLocaleString()}</strong></div>
+        <div class="result-row"><span>Self-employment tax</span><strong>$${output.seTax.toLocaleString()}</strong></div>
+        <div class="result-row"><span>Break-even contract rate</span><strong>$${output.breakEvenContractRate.toLocaleString()}</strong></div>
+        <div class="result-row"><span>Effective tax rate (contractor)</span><strong>${output.effectiveTaxRateContractor}%</strong></div>
+        <div class="result-row"><span>Effective tax rate (W2)</span><strong>${output.effectiveTaxRateW2}%</strong></div>
+      `;
+      results.classList.add("visible");
+    });
+  </script>
+
+  <AdSlot position="mid-content" />
+
+  <h2>Methodology</h2>
+  <p>Self-employment tax = 92.35% of net profit, taxed at 12.4% Social Security (capped at the $184,500 2026 wage base) plus 2.9% Medicare, plus 0.9% Additional Medicare Tax above the IRS threshold for your filing status. W2 FICA uses the employee-only rates (6.2% / 1.45%). Federal tax uses 2026 IRS brackets (Rev. Proc. 2025-32). State tax is currently modeled for a limited set of states — see the warning above if yours isn't covered yet.</p>
+
+  <h2>Worked example</h2>
+  <p>A single filer in Texas comparing an $80,000 W2 salary to a $100,000 1099 contract, with $12,000 in lost benefits and $3,000 in deductible business expenses, nets about $64,700 as a contractor versus $58,900 as a W2 employee at the same $100k/$80k headline numbers — the contractor comes out ahead here mainly because $100k is meaningfully more than $80k, not because contracting is inherently better once you account for the ~$13,700 in self-employment tax.</p>
+
+  <h2>Limitations</h2>
+  <ul>
+    <li>State tax is only modeled for a handful of states today (see the in-app warning if yours isn't covered) — everyone's real number will differ once full state coverage lands.</li>
+    <li>Head-of-household bracket thresholds below the 24% band are estimated, not yet directly verified against the final published IRS table.</li>
+    <li>This does not account for the Qualified Business Income (QBI) deduction, health insurance premium deductions, or self-employed retirement plan contribution limits beyond a flat percentage — all of which can meaningfully change a real contractor's numbers.</li>
+  </ul>
+</BaseLayout>

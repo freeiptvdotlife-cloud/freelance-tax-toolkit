@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Privacy Policy" description="Privacy policy for Freelance Tax Toolkit.">
+  <h1>Privacy Policy</h1>
+  <p><em>Last updated: 2026-09-25.</em></p>
+
+  <h2>What we collect</h2>
+  <p>The calculators on this site run entirely in your browser. The numbers you enter (income, salary, state, etc.) are never sent to any server operated by this site — they exist only in your browser's memory while you're using the page.</p>
+
+  <h2>Analytics and advertising</h2>
+  <p>This site uses standard web analytics and, where applicable, third-party advertising (Google AdSense). These services may use cookies or similar technologies to measure site usage and serve ads, including personalized ads where you've consented. You can control ad personalization through <a href="https://adssettings.google.com/" rel="nofollow noopener" target="_blank">Google's Ad Settings</a>.</p>
+
+  <h2>Cookie consent</h2>
+  <p>Visitors are shown a consent prompt before any non-essential cookies (including advertising cookies) are set. You can change your choice at any time:</p>
+  <button type="button" id="reset-consent">Manage cookie preferences</button>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy: see the <a href="/contact/">Contact</a> page.</p>
+
+  <script>
+    import { clearConsentState } from "../../lib/consent";
+    document.getElementById("reset-consent")!.addEventListener("click", () => {
+      clearConsentState();
+      location.reload();
+    });
+  </script>
+</BaseLayout>

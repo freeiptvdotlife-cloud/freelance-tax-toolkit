@@ -1,0 +1,14 @@
+{
+  "taxYear": 2026,
+  "status": "PARTIAL SEED DATA — Phase 1 in docs/09-autonomous-deep-research.md requires all 50 states + DC. Only no-tax states and a handful of flat/simplified examples are included here so the engine has something to run against during scaffolding. Do not ship with this file as-is.",
+  "noIncomeTaxStates": ["AK", "FL", "NV", "NH", "SD", "TN", "TX", "WA", "WY"],
+  "flatRateStatesApprox": {
+    "CO": 0.044,
+    "IL": 0.0495,
+    "MI": 0.0425,
+    "PA": 0.0307,
+    "UT": 0.0455,
+    "NC": 0.045
+  },
+  "flatRateNote": "These are simplified flat approximations of each state's top-line rate, not verified marginal-bracket tables, and not cited to a specific state DOR page yet. Progressive-bracket states (CA, NY, etc.) are NOT yet modeled — the engine falls back to a 0-rate placeholder with a console warning for any state not listed above, rather than silently guessing."
+}

@@ -1,0 +1,82 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdSlot from "../../components/AdSlot.astro";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Freelance Rate Calculator",
+  applicationCategory: "FinanceApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description: "Convert a target annual income into a required freelance hourly or day rate.",
+};
+---
+<BaseLayout
+  title="Freelance Rate Calculator"
+  description="Free calculator to convert a target income into the hourly or day rate you need to charge as a freelancer."
+  jsonLd={jsonLd}
+>
+  <h1>Freelance Rate Calculator</h1>
+  <p class="lede">Figure out the hourly or day rate you need to charge to hit a target income.</p>
+  <AdSlot position="top-banner" />
+  <div class="card">
+    <form id="calc-form">
+      <label>Target annual income ($)<input type="number" id="targetAnnualIncome" value="80000" min="0" /></label>
+      <label>Billable hours per week<input type="number" id="billableHoursPerWeek" value="25" min="1" max="80" /></label>
+      <label>Weeks off per year<input type="number" id="weeksOffPerYear" value="4" min="0" max="51" /></label>
+      <label>Annual business expenses ($)<input type="number" id="businessExpensesAnnual" value="5000" min="0" /></label>
+      <label>Tax buffer (%)<input type="number" id="taxBufferPct" value="30" min="0" max="99" /></label>
+      <label>Benefits you need to self-fund ($/year)<input type="number" id="benefitsReplacementCost" value="8000" min="0" /></label>
+      <button type="submit">Calculate</button>
+    </form>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    import { calculateFreelanceRate } from "@freelance-tax-toolkit/tax-engine";
+
+    const form = document.getElementById("calc-form") as HTMLFormElement;
+    const results = document.getElementById("results")!;
+    const num = (id: string) => parseFloat((document.getElementById(id) as HTMLInputElement).value) || 0;
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      try {
+        const output = calculateFreelanceRate({
+          targetAnnualIncome: num("targetAnnualIncome"),
+          billableHoursPerWeek: num("billableHoursPerWeek"),
+          weeksOffPerYear: num("weeksOffPerYear"),
+          businessExpensesAnnual: num("businessExpensesAnnual"),
+          taxBufferPct: num("taxBufferPct"),
+          benefitsReplacementCost: num("benefitsReplacementCost"),
+        });
+
+        results.innerHTML = `
+          <div class="result-row headline"><span>Required hourly rate</span><strong>$${output.requiredHourlyRate.toLocaleString()}</strong></div>
+          <div class="result-row"><span>Required day rate (8hr)</span><strong>$${output.requiredDayRate.toLocaleString()}</strong></div>
+          <div class="result-row"><span>Total billable hours/year</span><strong>${output.totalBillableHours.toLocaleString()}</strong></div>
+          <div class="result-row"><span>Gross revenue needed (before tax buffer)</span><strong>$${output.grossRevenueNeeded.toLocaleString()}</strong></div>
+        `;
+        results.classList.add("visible");
+      } catch (err) {
+        results.innerHTML = `<p class="msg msg-danger">${(err as Error).message}</p>`;
+        results.classList.add("visible");
+      }
+    });
+  </script>
+
+  <AdSlot position="mid-content" />
+
+  <h2>Methodology</h2>
+  <p>Required rate = (target income + business expenses + self-funded benefits) ÷ (1 − tax buffer %) ÷ total billable hours per year. This is a planning estimate, not a guarantee of what the market will pay.</p>
+
+  <h2>Worked example</h2>
+  <p>Someone targeting $80,000/year, billing 25 hours/week for 48 weeks (1,200 billable hours), with $5,000 in expenses and $8,000 in self-funded benefits, needs to charge about $111/hour after a 30% tax buffer. Billing more hours per week (say 40, with no weeks off) drops the required rate, since fixed costs spread across more hours.</p>
+
+  <h2>Limitations</h2>
+  <ul>
+    <li>The 30% default tax buffer is a rough placeholder, not personalized to your actual bracket — use the 1099 vs W2 or Quarterly Tax calculators for a real tax estimate at your income level.</li>
+    <li>Doesn't account for non-billable time spent on sales, admin, or unpaid revisions beyond what you build into your own "weeks off" input.</li>
+  </ul>
+</BaseLayout>

@@ -1,0 +1,87 @@
+---
+// See src/lib/consent.ts for the important caveat: this is a functional stopgap,
+// not an IAB TCF-certified CMP. Shown to every visitor (not geo-targeted), which is
+// the simpler and safer default for a static site with no server-side geo detection.
+---
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>
+    This site uses cookies for analytics and advertising. See our
+    <a href="/privacy/">Privacy Policy</a> for details.
+  </p>
+  <div class="consent-banner__actions">
+    <button type="button" id="consent-reject">Reject non-essential</button>
+    <button type="button" id="consent-accept">Accept</button>
+  </div>
+</div>
+
+<style is:global>
+  .consent-banner[hidden] {
+    display: none;
+  }
+  .consent-banner {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: var(--bg-elevated);
+    color: var(--text);
+    border-top: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 16px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .consent-banner p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    flex: 1 1 240px;
+  }
+  .consent-banner__actions {
+    display: flex;
+    gap: 8px;
+  }
+  .consent-banner__actions button {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  #consent-accept {
+    background: var(--primary);
+    color: var(--primary-contrast);
+    border-color: var(--primary);
+  }
+  #consent-reject {
+    background: transparent;
+    color: var(--text);
+  }
+</style>
+
+<script>
+  import { getConsentState, setConsentState } from "../lib/consent";
+
+  const banner = document.getElementById("consent-banner") as HTMLDivElement;
+  const acceptBtn = document.getElementById("consent-accept") as HTMLButtonElement;
+  const rejectBtn = document.getElementById("consent-reject") as HTMLButtonElement;
+
+  if (!getConsentState()) {
+    banner.hidden = false;
+  }
+
+  acceptBtn.addEventListener("click", () => {
+    setConsentState("accepted");
+    banner.hidden = true;
+  });
+
+  rejectBtn.addEventListener("click", () => {
+    setConsentState("rejected");
+    banner.hidden = true;
+  });
+</script>

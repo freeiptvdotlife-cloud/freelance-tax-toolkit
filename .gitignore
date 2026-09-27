@@ -1,0 +1,10 @@
+node_modules/
+.venv/
+dist/
+.astro/
+*.log
+.DS_Store
+# Never commit local credential files — see scripts/README (Google Ads OAuth) and repo root notes.
+google-ads.yaml
+client_secret*.json
+*.env

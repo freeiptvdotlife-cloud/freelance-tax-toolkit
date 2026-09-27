@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const tools = [
+  {
+    href: "/1099-vs-w2-calculator/",
+    icon: "⚖️",
+    title: "1099 vs W2 Comparator",
+    description: "Compare take-home pay between a contract offer and a salaried offer.",
+  },
+  {
+    href: "/quarterly-tax-calculator/",
+    icon: "📅",
+    title: "Quarterly Tax Calculator",
+    description: "Figure out what you owe the IRS each quarter.",
+  },
+  {
+    href: "/s-corp-savings-calculator/",
+    icon: "🏢",
+    title: "S-Corp Savings Calculator",
+    description: "See if electing S-corp status would save you money.",
+  },
+  {
+    href: "/freelance-rate-calculator/",
+    icon: "💵",
+    title: "Freelance Rate Calculator",
+    description: "Convert a target salary into an hourly or day rate.",
+  },
+];
+---
+<BaseLayout title="Free Self-Employment Tax Calculators" description="Four free calculators for freelancers, 1099 contractors, and small business owners.">
+  <h1>Freelance Tax Toolkit</h1>
+  <p class="lede">Four free calculators for freelancers, 1099 contractors, and small business owners. Everything runs in your browser — nothing is sent to a server.</p>
+
+  <div class="tool-grid">
+    {tools.map((tool) => (
+      <a class="tool-card" href={tool.href}>
+        <div class="tool-card__icon">{tool.icon}</div>
+        <h3>{tool.title}</h3>
+        <p>{tool.description}</p>
+      </a>
+    ))}
+  </div>
+</BaseLayout>

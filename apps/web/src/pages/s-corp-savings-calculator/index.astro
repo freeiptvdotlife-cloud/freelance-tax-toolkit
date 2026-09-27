@@ -1,0 +1,93 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdSlot from "../../components/AdSlot.astro";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "S-Corp Election Savings Calculator",
+  applicationCategory: "FinanceApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description: "Estimate self-employment tax savings from electing S-corp status versus a sole proprietorship or LLC.",
+};
+---
+<BaseLayout
+  title="S-Corp Election Savings Calculator"
+  description="Free calculator estimating S-corp election tax savings versus sole proprietorship or LLC."
+  jsonLd={jsonLd}
+>
+  <h1>S-Corp Election Savings Calculator</h1>
+  <p class="lede">Estimate whether electing S-corp tax status would save you money versus staying a sole proprietor or single-member LLC.</p>
+  <AdSlot position="top-banner" />
+  <div class="card">
+    <form id="calc-form">
+      <label>Net business profit ($/year)<input type="number" id="netBusinessProfit" value="150000" min="0" /></label>
+      <label>Reasonable salary you'd pay yourself ($/year)<input type="number" id="reasonableSalary" value="70000" min="0" /></label>
+      <label>Filing status
+        <select id="filingStatus">
+          <option value="single">Single</option>
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </label>
+      <label>Annual payroll service cost ($)<input type="number" id="payrollServiceCostAnnual" value="600" min="0" /></label>
+      <label>Additional corp filing/accounting cost ($/year)<input type="number" id="additionalCorpFilingCostAnnual" value="800" min="0" /></label>
+      <button type="submit">Calculate</button>
+    </form>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    import { calculateSCorpSavings } from "@freelance-tax-toolkit/tax-engine";
+
+    const form = document.getElementById("calc-form") as HTMLFormElement;
+    const results = document.getElementById("results")!;
+    const num = (id: string) => parseFloat((document.getElementById(id) as HTMLInputElement).value) || 0;
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const filingStatus = (document.getElementById("filingStatus") as HTMLSelectElement).value as
+        | "single"
+        | "mfj"
+        | "hoh";
+
+      const output = calculateSCorpSavings({
+        netBusinessProfit: num("netBusinessProfit"),
+        reasonableSalary: num("reasonableSalary"),
+        payrollServiceCostAnnual: num("payrollServiceCostAnnual"),
+        additionalCorpFilingCostAnnual: num("additionalCorpFilingCostAnnual"),
+        filingStatus,
+      });
+
+      const verdict =
+        output.netSavings > 0
+          ? `<p class="msg msg-success"><strong>S-corp election looks like it would save you about $${output.netSavings.toLocaleString()}/year.</strong></p>`
+          : `<p class="msg msg-warning"><strong>At this profit/salary level, S-corp election doesn't appear worth the overhead (net ${output.netSavings < 0 ? "cost" : "wash"} of $${Math.abs(output.netSavings).toLocaleString()}/year).</strong></p>`;
+
+      results.innerHTML = `
+        ${verdict}
+        <div class="result-row"><span>Sole proprietor self-employment tax</span><strong>$${output.soleProSeTax.toLocaleString()}</strong></div>
+        <div class="result-row"><span>S-corp payroll tax on salary</span><strong>$${output.scorpPayrollTax.toLocaleString()}</strong></div>
+        <div class="result-row"><span>S-corp total added cost (payroll tax + fees)</span><strong>$${output.scorpTotalCost.toLocaleString()}</strong></div>
+        <div class="result-row"><span>Estimated break-even profit</span><strong>$${output.breakEvenProfit.toLocaleString()}</strong></div>
+      `;
+      results.classList.add("visible");
+    });
+  </script>
+
+  <AdSlot position="mid-content" />
+
+  <h2>Methodology &amp; important caveat</h2>
+  <p>"Reasonable salary" is an IRS facts-and-circumstances standard, not a formula — this tool does not tell you what your reasonable salary should be, only the tax effect of a salary figure you choose. This is not personalized business or legal advice; consult a CPA before electing S-corp status.</p>
+
+  <h2>Worked example</h2>
+  <p>A single-member LLC with $150,000 in net profit, paying a $70,000 reasonable salary, saves roughly $9,000/year by electing S-corp status — the $21,200 sole-proprietor self-employment tax drops to about $12,100 in combined S-corp payroll tax and administrative overhead. At $50,000 profit with a $45,000 salary, there's too little distribution left over for the election to pay for itself.</p>
+
+  <h2>Limitations</h2>
+  <ul>
+    <li>This tool doesn't determine what your reasonable salary should be — that's a facts-and-circumstances judgment call the IRS makes case by case, and getting it wrong (paying yourself too little) is the most common way S-corp elections get challenged in an audit.</li>
+    <li>State-level S-corp fees and franchise taxes (e.g., California's minimum franchise tax) aren't included.</li>
+    <li>Ignores one-time setup costs (state S-corp election filing, potential LLC-to-corp conversion costs) — only ongoing annual costs are modeled.</li>
+  </ul>
+</BaseLayout>

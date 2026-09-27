@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Methodology" description="Data sources, formulas, and update cadence for every Freelance Tax Toolkit calculator.">
+  <h1>Methodology</h1>
+  <p>Each calculator page has its own "Methodology" and "Limitations" sections with formula-level detail. This page covers the shared data sources and how often they're updated.</p>
+
+  <h2>Data sources</h2>
+  <ul>
+    <li><strong>Federal tax brackets, standard deduction (Single &amp; MFJ):</strong> IRS Rev. Proc. 2025-32, tax year 2026.</li>
+    <li><strong>Head-of-Household bracket thresholds below the 24% band:</strong> currently estimated by scaling 2025 figures forward, pending direct verification against the full text of Rev. Proc. 2025-32. This is disclosed, not hidden, in the underlying data file.</li>
+    <li><strong>Social Security wage base ($184,500 for 2026):</strong> corroborated across multiple secondary sources; pending direct confirmation against the Social Security Administration's official 2026 fact sheet.</li>
+    <li><strong>Additional Medicare Tax thresholds:</strong> set by statute (IRC §3101(b)(2)), not inflation-adjusted, unchanged since 2013.</li>
+    <li><strong>State income tax:</strong> currently modeled for no-income-tax states plus a handful of flat-rate approximations. Most states with progressive tax brackets are not yet modeled — the calculators disclose this per state rather than silently guessing.</li>
+  </ul>
+
+  <h2>Update cadence</h2>
+  <p>Federal figures are tied to a specific tax year and are reviewed each time the IRS publishes new inflation-adjusted figures (typically each autumn for the following tax year). State data is a work in progress — see the note on each calculator if your state isn't yet covered.</p>
+
+  <h2>What these tools don't do</h2>
+  <p>They don't file taxes, store any data (all calculations run in your browser and nothing is sent to a server), or account for every deduction, credit, or state-specific rule that could apply to your situation. They're planning estimates, not substitutes for a tax professional.</p>
+</BaseLayout>

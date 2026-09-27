@@ -1,0 +1,68 @@
+---
+// Reserved-height ad container per docs/09-autonomous-deep-research.md Section 9.
+// No AdSense script is loaded yet — there is no publisher ID until the AdSense
+// application (Phase 4) is approved. The fixed min-height here is the point: it
+// guarantees zero layout shift whenever a real ad unit is dropped in later, because
+// the space is already reserved before any ad script runs.
+interface Props {
+  position: "top-banner" | "mid-content" | "bottom" | "sidebar";
+}
+const { position } = Astro.props;
+
+const heights: Record<Props["position"], string> = {
+  "top-banner": "100px",
+  "mid-content": "250px",
+  bottom: "250px",
+  sidebar: "600px",
+};
+---
+<div
+  class={`ad-slot ad-slot--${position}`}
+  style={`min-height: ${heights[position]};`}
+  data-ad-position={position}
+  aria-hidden="true"
+>
+  <span class="ad-slot__label">Advertisement</span>
+</div>
+
+<script>
+  // Placeholder wiring for when a real ad network script exists. Real ad tags must
+  // only be injected here after hasAdConsent() is true — this listener is already in
+  // place so that requirement isn't forgotten when AdSense/AdMob web tags are added.
+  import { hasAdConsent, onConsentChange } from "../lib/consent";
+
+  function loadAdsIfConsented() {
+    if (hasAdConsent()) {
+      // TODO(Phase 4): inject real AdSense <ins> / ad script per slot here.
+    }
+  }
+
+  loadAdsIfConsented();
+  onConsentChange(loadAdsIfConsented);
+</script>
+
+<style>
+  .ad-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-subtle);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    margin: 24px 0;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .ad-slot--sidebar {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .ad-slot--sidebar {
+      display: flex;
+      position: sticky;
+      top: 24px;
+    }
+  }
+</style>

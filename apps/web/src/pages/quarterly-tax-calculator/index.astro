@@ -1,0 +1,110 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AdSlot from "../../components/AdSlot.astro";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Quarterly Estimated Tax Calculator",
+  applicationCategory: "FinanceApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description: "Calculate quarterly estimated tax payments for self-employed filers using IRS safe-harbor rules.",
+};
+---
+<BaseLayout
+  title="Quarterly Estimated Tax Calculator"
+  description="Free calculator for self-employed quarterly estimated tax payments, using IRS safe-harbor rules."
+  jsonLd={jsonLd}
+>
+  <h1>Quarterly Estimated Tax Calculator</h1>
+  <p class="lede">Figure out how much you should pay the IRS each quarter as a self-employed filer.</p>
+  <AdSlot position="top-banner" />
+  <div class="card">
+    <form id="calc-form">
+      <label>Expected annual net profit ($)<input type="number" id="expectedAnnualNetProfit" value="100000" min="0" /></label>
+      <label>Prior year total tax liability ($, 0 if first year)<input type="number" id="priorYearTaxLiability" value="0" min="0" /></label>
+      <label><input type="checkbox" id="priorYearAgiOver150k" /> Prior year AGI was over $150,000</label>
+      <label>Filing status
+        <select id="filingStatus">
+          <option value="single">Single</option>
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </label>
+      <label>State<input type="text" id="state" value="TX" maxlength="2" style="text-transform:uppercase" /></label>
+      <label>Payments already made this year ($)<input type="number" id="paymentsAlreadyMadeYtd" value="0" min="0" /></label>
+      <label>Which quarter are you paying?
+        <select id="quarterIndex">
+          <option value="1">Q1 (due Apr 15)</option>
+          <option value="2">Q2 (due Jun 15)</option>
+          <option value="3">Q3 (due Sep 15)</option>
+          <option value="4">Q4 (due Jan 15)</option>
+        </select>
+      </label>
+      <button type="submit">Calculate</button>
+    </form>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    import { calculateQuarterlyTax, isStateModeled } from "@freelance-tax-toolkit/tax-engine";
+
+    const form = document.getElementById("calc-form") as HTMLFormElement;
+    const results = document.getElementById("results")!;
+    const num = (id: string) => parseFloat((document.getElementById(id) as HTMLInputElement).value) || 0;
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const state = (document.getElementById("state") as HTMLInputElement).value.toUpperCase();
+      const filingStatus = (document.getElementById("filingStatus") as HTMLSelectElement).value as
+        | "single"
+        | "mfj"
+        | "hoh";
+      const quarterIndex = parseInt(
+        (document.getElementById("quarterIndex") as HTMLSelectElement).value
+      ) as 1 | 2 | 3 | 4;
+      const priorYearAgiOver150k = (document.getElementById("priorYearAgiOver150k") as HTMLInputElement)
+        .checked;
+
+      const output = calculateQuarterlyTax({
+        expectedAnnualNetProfit: num("expectedAnnualNetProfit"),
+        priorYearTaxLiability: num("priorYearTaxLiability"),
+        priorYearAgiOver150k,
+        filingStatus,
+        state,
+        paymentsAlreadyMadeYtd: num("paymentsAlreadyMadeYtd"),
+        quarterIndex,
+      });
+
+      const stateWarning = isStateModeled(state)
+        ? ""
+        : `<p class="msg msg-warning">⚠️ State tax for "${state}" isn't modeled yet — figures below exclude state tax.</p>`;
+
+      results.innerHTML = `
+        ${stateWarning}
+        <div class="result-row headline"><span>Due this quarter</span><strong>$${output.currentQuarterDue.toLocaleString()}</strong></div>
+        <div class="result-row"><span>Estimated annual tax owed</span><strong>$${output.annualTaxOwed.toLocaleString()}</strong></div>
+        <div class="result-row"><span>Required annual payment (safe harbor)</span><strong>$${output.requiredAnnualPayment.toLocaleString()}</strong></div>
+        <div class="result-row"><span>Per-quarter payment</span><strong>$${output.perQuarterPayment.toLocaleString()}</strong></div>
+        <div class="result-row"><span>Underpayment penalty risk</span><strong>${output.underpaymentPenaltyRisk ? "Yes" : "No"}</strong></div>
+      `;
+      results.classList.add("visible");
+    });
+  </script>
+
+  <AdSlot position="mid-content" />
+
+  <h2>Methodology</h2>
+  <p>Uses IRS safe-harbor rules: pay the lesser of 90% of this year's estimated tax, or 100% (110% if prior-year AGI exceeded $150,000) of last year's tax liability. Due dates shown are the standard 2026 quarterly schedule and don't account for weekend/holiday shifts — verify the exact date on IRS.gov before paying.</p>
+
+  <h2>Worked example</h2>
+  <p>A single filer in Texas expecting $100,000 in net profit for the year, with no prior-year liability, owes roughly $22,900/year under the 90%-safe-harbor rule — about $5,700 per quarter. If they've paid nothing by Q2, the calculator flags underpayment penalty risk and shows the full two-quarter catch-up amount due.</p>
+
+  <h2>Limitations</h2>
+  <ul>
+    <li>Due dates shown are the standard calendar and don't adjust for weekends or federal holidays in a given year — always confirm the exact date on IRS.gov before paying.</li>
+    <li>State estimated-tax rules (their own safe-harbor percentages and due dates) aren't modeled — this only computes the federal + partial-state estimate.</li>
+    <li>Doesn't account for uneven income across the year (e.g., a big Q4 payment) — the annualized-income installment method, which can reduce early-quarter payments for lumpy income, isn't implemented.</li>
+  </ul>
+</BaseLayout>

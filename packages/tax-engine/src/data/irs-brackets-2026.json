@@ -1,0 +1,55 @@
+{
+  "taxYear": 2026,
+  "sources": {
+    "federalBracketsSingleAndMfj": "IRS, Rev. Proc. 2025-32 — https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill (fetched 2026-09-25)",
+    "ssWageBase": "Social Security Administration 2026 wage base, $184,500 — corroborated by multiple secondary sources (ustax.tools, mjcpa.com), fetched 2026-09-25. Verify against ssa.gov's official 2026 fact sheet before production use.",
+    "additionalMedicareThresholds": "IRC Section 3101(b)(2) — statutory, NOT inflation-adjusted; unchanged since 2013 ($200k single/HOH, $250k MFJ, $125k MFS)."
+  },
+  "standardDeduction": {
+    "single": 16100,
+    "mfj": 32200,
+    "hoh": 24150
+  },
+  "ssWageBase": 184500,
+  "socialSecurityRate": 0.124,
+  "medicareRate": 0.029,
+  "employeeSocialSecurityRate": 0.062,
+  "employeeMedicareRate": 0.0145,
+  "additionalMedicareRate": 0.009,
+  "additionalMedicareThreshold": {
+    "single": 200000,
+    "mfj": 250000,
+    "hoh": 200000
+  },
+  "seNetEarningsFactor": 0.9235,
+  "federalBrackets": {
+    "single": [
+      { "upTo": 12400, "rate": 0.10 },
+      { "upTo": 50400, "rate": 0.12 },
+      { "upTo": 105700, "rate": 0.22 },
+      { "upTo": 201775, "rate": 0.24 },
+      { "upTo": 256225, "rate": 0.32 },
+      { "upTo": 640600, "rate": 0.35 },
+      { "upTo": null, "rate": 0.37 }
+    ],
+    "mfj": [
+      { "upTo": 24800, "rate": 0.10 },
+      { "upTo": 100800, "rate": 0.12 },
+      { "upTo": 211400, "rate": 0.22 },
+      { "upTo": 403550, "rate": 0.24 },
+      { "upTo": 512450, "rate": 0.32 },
+      { "upTo": 768700, "rate": 0.35 },
+      { "upTo": null, "rate": 0.37 }
+    ],
+    "hoh": [
+      { "upTo": 17400, "rate": 0.10, "verified": false },
+      { "upTo": 66300, "rate": 0.12, "verified": false },
+      { "upTo": 105700, "rate": 0.22, "verified": false },
+      { "upTo": 201775, "rate": 0.24, "verified": true },
+      { "upTo": 256225, "rate": 0.32, "verified": true },
+      { "upTo": 640600, "rate": 0.35, "verified": true },
+      { "upTo": null, "rate": 0.37, "verified": true }
+    ]
+  },
+  "hohNote": "HOH brackets at 24% and above are historically identical to Single (confirmed in the 2026 fetch). The 10%/12%/22% HOH thresholds here are ESTIMATED by scaling the 2025 HOH thresholds (Rev. Proc. 2024-40) by the Single bracket's 2025->2026 inflation factor — they are NOT directly sourced from Rev. Proc. 2025-32's HOH table. Marked verified:false. Replace before production (Phase 1 acceptance criterion in docs/09-autonomous-deep-research.md is not yet met for these three values)."
+}
