@@ -6,9 +6,16 @@
     "apps/*",
     "packages/*"
   ],
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "typescript-eslint": "^8.70.1"
+  },
   "scripts": {
     "test": "npm run test --workspace=packages/tax-engine",
     "dev:web": "npm run dev --workspace=apps/web",
-    "build:web": "npm run build --workspace=apps/web"
+    "build:web": "npm run build --workspace=apps/web",
+    "lint": "eslint ."
   }
 }
