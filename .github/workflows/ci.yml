@@ -34,9 +34,25 @@ jobs:
           path: apps/web/dist
           retention-days: 7
 
+  lighthouse:
+    name: Lighthouse budgets
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:web
+      - name: Lighthouse CI
+        run: npx --yes @lhci/cli@0.15.x autorun --config=lighthouserc.json
+
   deploy:
     name: Deploy to Cloudflare Pages
-    needs: verify
+    needs: [verify, lighthouse]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
