@@ -1,13 +1,11 @@
 ---
-// Reserved-height ad container per docs/09-autonomous-deep-research.md Section 9.
-// No AdSense script is loaded yet — there is no publisher ID until the AdSense
-// application (Phase 4) is approved. The fixed min-height here is the point: it
-// guarantees zero layout shift whenever a real ad unit is dropped in later, because
-// the space is already reserved before any ad script runs.
 interface Props {
   position: "top-banner" | "mid-content" | "bottom" | "sidebar";
+  slot?: string;
 }
-const { position } = Astro.props;
+const { position, slot } = Astro.props;
+const client = import.meta.env.PUBLIC_ADSENSE_CLIENT as string | undefined;
+const isLive = Boolean(client && slot);
 
 const heights: Record<Props["position"], string> = {
   "top-banner": "100px",
@@ -20,26 +18,20 @@ const heights: Record<Props["position"], string> = {
   class={`ad-slot ad-slot--${position}`}
   style={`min-height: ${heights[position]};`}
   data-ad-position={position}
-  aria-hidden="true"
+  aria-label="Advertisement"
 >
   <span class="ad-slot__label">Advertisement</span>
+  {isLive && (
+    <ins
+      class="adsbygoogle"
+      style="display:block;width:100%;height:100%"
+      data-ad-client={client}
+      data-ad-slot={slot}
+      data-ad-format={position === "sidebar" ? "vertical" : "auto"}
+      data-full-width-responsive={position === "sidebar" ? "false" : "true"}
+    />
+  )}
 </div>
-
-<script>
-  // Placeholder wiring for when a real ad network script exists. Real ad tags must
-  // only be injected here after hasAdConsent() is true — this listener is already in
-  // place so that requirement isn't forgotten when AdSense/AdMob web tags are added.
-  import { hasAdConsent, onConsentChange } from "../lib/consent";
-
-  function loadAdsIfConsented() {
-    if (hasAdConsent()) {
-      // TODO(Phase 4): inject real AdSense <ins> / ad script per slot here.
-    }
-  }
-
-  loadAdsIfConsented();
-  onConsentChange(loadAdsIfConsented);
-</script>
 
 <style>
   .ad-slot {
