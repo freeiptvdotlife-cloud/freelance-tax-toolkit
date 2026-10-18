@@ -85,6 +85,57 @@ const jsonLd = {
 
   <AdSlot position="mid-content" />
 
+  <section class="card prose faq-section">
+    <h2>Frequently asked questions</h2>
+
+    <details open>
+      <summary>Is self-employment tax really 15.3%?</summary>
+      <p>Yes, but only on 92.35% of your net profit (the IRS lets you deduct the "employer half" before applying the rate). Social Security is 12.4% on the first $184,500 of 2026 net earnings from self-employment; Medicare is 2.9% on all net earnings, plus a 0.9% Additional Medicare Tax above $200,000 (single) or $250,000 (married filing jointly). W2 employees pay only half these rates (6.2% + 1.45%) because the employer pays the other half — but as a contractor, you pay both halves.</p>
+    </details>
+
+    <details>
+      <summary>What counts as a deductible business expense?</summary>
+      <p>Ordinary and necessary expenses directly related to your contract work: home office (dedicated space, proportional utilities), business-use portion of phone and internet, software and subscriptions, professional development, health insurance premiums (deducted on Schedule 1 rather than Schedule C), and retirement contributions. Personal expenses, commuting costs, and anything not directly tied to earning income are not deductible. Keep receipts and a log — the IRS standard is "ordinary and necessary."</p>
+    </details>
+
+    <details>
+      <summary>What is the break-even contract rate?</summary>
+      <p>The gross 1099 rate at which your after-tax take-home equals what you would net on the W2 offer. This calculator shows it after you run the comparison — it is the rate where the "net take-home" lines are equal. It accounts for self-employment tax, lost benefits, and business expenses. A common rule of thumb is to add 20–30% to the W2 salary, but the real number depends heavily on your state, filing status, and benefit values.</p>
+    </details>
+
+    <details>
+      <summary>Does the QBI deduction apply to my 1099 income?</summary>
+      <p>Possibly, but this calculator does not model it. The Qualified Business Income (QBI) deduction (Section 199A) lets many self-employed filers deduct up to 20% of qualified business income from taxable income. It phases out at higher incomes and is disallowed for certain "specified service trades or businesses" (SSTB) like law, consulting, and financial services. If you expect to qualify, your real contractor tax burden is lower than what this calculator shows — consult a tax professional.</p>
+    </details>
+
+    <details>
+      <summary>How do I handle health insurance as a contractor?</summary>
+      <p>Self-employed individuals can deduct 100% of health, dental, and vision insurance premiums paid for themselves and their family from gross income on Schedule 1 — not Schedule C, and not subject to the 2%-of-AGI floor. This reduces both income tax and the SE tax base. The W2 benefits field in this calculator lets you value the employer-sponsored coverage you would lose — enter the full premium cost your employer was paying, not just your paycheck deduction.</p>
+    </details>
+
+    <details>
+      <summary>What quarterly estimated tax payments will I owe?</summary>
+      <p>As a contractor, you owe estimated taxes quarterly (April 15, June 16, September 15, January 15). A safe harbor is to pay at least 100% of last year's tax liability (110% if AGI was above $150,000). Underpayments incur a penalty. Use the <a href="/quarterly-tax-calculator/">quarterly estimated tax calculator</a> to work out how much to set aside each quarter based on your expected income.</p>
+    </details>
+
+    <details>
+      <summary>How much should I contribute to a retirement account?</summary>
+      <p>A Solo 401(k) or SEP-IRA lets self-employed individuals contribute far more than the $23,500 W2 employee 401(k) limit. A SEP-IRA allows up to 25% of net self-employment income (max $70,000 for 2025). A Solo 401(k) allows up to $23,500 as employee contributions plus up to 25% of compensation as employer contributions, for a combined max of $70,000. Pre-tax contributions reduce your taxable income dollar-for-dollar. The retirement field in this calculator models a flat percentage contribution.</p>
+    </details>
+
+    <details>
+      <summary>Could I be misclassified as a contractor?</summary>
+      <p>Possibly. The IRS, DOL, and most states apply multi-factor tests: does the company control how and when you work? Do you work exclusively for one client? Does the company provide tools and training? If the answer to several of these is yes, you may be an employee by law — and misclassification can mean the company owes back payroll taxes and benefits. The calculator compares the financial outcome assuming your classification is correct; it does not assess whether the classification itself is legally sound.</p>
+    </details>
+
+    <details>
+      <summary>Which states have no income tax?</summary>
+      <p>As of 2026: Alaska, Florida, Nevada, New Hampshire (no wage income tax), South Dakota, Tennessee (no wage income tax), Texas, Washington, and Wyoming. If you work in one of these states and your client is based elsewhere, generally the state you work <em>in</em> determines state tax, not where the client is located — though nexus rules vary. Enter your two-letter state code above; if yours is not yet modeled, the result shows federal tax only with a warning.</p>
+    </details>
+
+    <p class="faq-links">Related calculators: <a href="/quarterly-tax-calculator/">Quarterly estimated tax</a> · <a href="/s-corp-savings-calculator/">S-corp savings estimator</a> · <a href="/freelance-rate-calculator/">Freelance rate calculator</a></p>
+  </section>
+
   <h2>Methodology</h2>
   <p>Self-employment tax = 92.35% of net profit, taxed at 12.4% Social Security (capped at the $184,500 2026 wage base) plus 2.9% Medicare, plus 0.9% Additional Medicare Tax above the IRS threshold for your filing status. W2 FICA uses the employee-only rates (6.2% / 1.45%). Federal tax uses 2026 IRS brackets (Rev. Proc. 2025-32). State tax is currently modeled for a limited set of states — see the warning above if yours isn't covered yet.</p>
 
@@ -98,3 +149,56 @@ const jsonLd = {
     <li>This does not account for the Qualified Business Income (QBI) deduction, health insurance premium deductions, or self-employed retirement plan contribution limits beyond a flat percentage — all of which can meaningfully change a real contractor's numbers.</li>
   </ul>
 </BaseLayout>
+
+<style>
+  .faq-section {
+    margin-top: 2rem;
+  }
+  .faq-section details {
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    padding: 0 16px;
+    margin: 8px 0;
+    background: var(--surface, #fff);
+  }
+  .faq-section details[open] {
+    border-color: var(--accent-color, #3b82f6);
+  }
+  .faq-section summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 46px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    list-style: none;
+    padding: 2px 0;
+  }
+  .faq-section summary::-webkit-details-marker { display: none; }
+  .faq-section summary::after {
+    content: "+";
+    font-size: 1.1rem;
+    color: var(--muted-color, #6b7280);
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+  .faq-section details[open] summary::after { content: "−"; }
+  .faq-section details > p,
+  .faq-section details > ul,
+  .faq-section details > ol {
+    margin-bottom: 14px;
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+  .faq-links {
+    margin-top: 16px;
+    font-size: 0.9rem;
+    color: var(--muted-color, #6b7280);
+  }
+  .faq-links a {
+    color: var(--accent-color, #2563eb);
+    text-decoration: none;
+  }
+  .faq-links a:hover { text-decoration: underline; }
+</style>
