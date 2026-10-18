@@ -97,10 +97,7 @@ describe("compareW2VsContractor — break-even rate", () => {
   });
 
   it("contractor at breakEvenRate matches W2 take-home within $1", () => {
-    const { breakEvenContractRate, w2NetTakeHome, w2BenefitsValue } = {
-      ...compareW2VsContractor(baseInput),
-      w2BenefitsValue: baseInput.w2BenefitsValue,
-    };
+    const { breakEvenContractRate, w2NetTakeHome } = compareW2VsContractor(baseInput);
     // Re-run comparator at exactly the break-even rate
     const atBreakEven = compareW2VsContractor({
       ...baseInput,
